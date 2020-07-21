@@ -34,11 +34,12 @@ public class UserServiceImpl implements UserService{
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserDTO getUserData(String userId) {
-        if (map.containsKey(userId)) {
-            return map.get(userId);
-        }  else {
-            throw new EmptyDataException();
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if (userEntity == null) {
+            throw new UsernameNotFoundException(userId);
         }
+        return new ModelMapper().map(userEntity, UserDTO.class);
     }
 
     public UserDTO createUser(UserDTO userDetails) {
