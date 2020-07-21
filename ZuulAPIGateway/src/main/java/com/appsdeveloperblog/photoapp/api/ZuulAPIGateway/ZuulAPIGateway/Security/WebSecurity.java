@@ -32,7 +32,9 @@ public class WebSecurity  extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, environment.getProperty("api.users-ws.registration.path")).permitAll()
                 .antMatchers(HttpMethod.GET, environment.getProperty("api.users-ws.status.path")).permitAll()
                 .antMatchers(environment.getProperty("api.users-ws.console.path")).permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+                .and()
+                .addFilter(new AuthorizationFilter(authenticationManager(), environment));
 
         //telling spring not to create a http session that caches cookies that might mess up how our shit is authorized
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

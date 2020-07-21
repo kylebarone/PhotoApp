@@ -6,6 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -34,17 +35,23 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
             return;
         }
+
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        chain.doFilter(request, response);
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(environment.getProperty("authorization.token.header.name"));
 
-        if (authorizationToken == null) {
+        if (authorizationHeader == null) {
             return null;
         }
 
         String token = authorizationHeader.replace(environment.getProperty("authorization.token.header.prefix"), "");
 
+        //token can contain more info than just a userI
         String userId = Jwts.parser()
                 .setSigningKey(environment.getProperty("token.secret"))
                 .parseClaimsJws(token)
