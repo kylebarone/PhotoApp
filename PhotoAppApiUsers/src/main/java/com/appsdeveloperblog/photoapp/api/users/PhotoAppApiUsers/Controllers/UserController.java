@@ -27,11 +27,14 @@ import javax.validation.Valid;
 @RequestMapping("users")
 public class UserController {
 
-    @Autowired
     UserServiceImpl userService;
+    Environment env;
 
     @Autowired
-    private Environment env;
+    public UserController(UserServiceImpl userService, Environment environment) {
+        this.userService = userService;
+        this.env = environment;
+    }
 
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
@@ -79,7 +82,8 @@ public class UserController {
 
     @GetMapping(path = "/status")
     public ResponseEntity<String> getStatus() {
-        return new ResponseEntity<>("Working on port: " + env.getProperty("local.server.port"),
+        String statusMessage = "Working on port: " + env.getProperty("local.server.port") + " ->" + env.getProperty("test.example");
+        return new ResponseEntity<>(statusMessage,
                 HttpStatus.OK);
     }
 
