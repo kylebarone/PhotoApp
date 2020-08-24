@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Returns User Details
  */
-public class UserReponseModel {
+public class UserResponseModel {
 
     private String name;
     private String userId;

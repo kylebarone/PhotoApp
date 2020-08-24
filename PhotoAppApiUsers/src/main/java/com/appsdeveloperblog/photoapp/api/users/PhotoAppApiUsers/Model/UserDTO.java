@@ -2,6 +2,7 @@ package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model;
 
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UserDTO implements Serializable {
 
@@ -12,6 +13,7 @@ public class UserDTO implements Serializable {
     private String email;
     private String password;
     private String encryptedPass;
+    private List<AlbumResponseModel> albums;
 
     public String getEncryptedPass() {
         return encryptedPass;
@@ -59,6 +61,14 @@ public class UserDTO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<AlbumResponseModel> getAlbums() {
+        return albums;
+    }
+
+    public void setAlbums(List<AlbumResponseModel> albums) {
+        this.albums = albums;
     }
 }
 

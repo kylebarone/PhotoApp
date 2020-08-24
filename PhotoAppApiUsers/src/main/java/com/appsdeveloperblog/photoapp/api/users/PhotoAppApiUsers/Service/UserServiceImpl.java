@@ -3,35 +3,52 @@ import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.UserEntity
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.UserRepository;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Exceptions.*;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.FakeDataBase;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.AlbumResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserDTO;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserRequest;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserRequestUpdate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MatchingStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService{
 
-    @Autowired
+
     UserRepository userRepository;
+    RestTemplate restTemplate;
+    Environment env;
 
-    @Autowired
-    FakeDataBase<String, UserDTO> map;
-
-    @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+    Logger logger = LoggerFactory.getLogger(this.getClass());;
+
+    @Autowired
+    public UserServiceImpl(Environment env, UserRepository userRepository,
+                           RestTemplate restTemplate, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.env = env;
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.restTemplate = restTemplate;
+    }
 
 
     @Override
@@ -40,7 +57,17 @@ public class UserServiceImpl implements UserService{
         if (userEntity == null) {
             throw new UsersServiceException(userId);
         }
+
         UserDTO userDTO = new ModelMapper().map(userEntity, UserDTO.class);
+
+        String url = String.format(env.getProperty("api.albums-ws.endpoints.getAlbums.url"), userDTO.getUserId());
+        logger.info("!!!!!Making API call to " + url + " !!!!");
+        ResponseEntity<List<AlbumResponseModel>> responseEntity = restTemplate
+                .exchange(url, HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<AlbumResponseModel>>(){});
+        logger.info("!!!!!API call was made!!!!");
+
+        userDTO.setAlbums(responseEntity.getBody());
         return userDTO;
     }
 
@@ -84,22 +111,4 @@ public class UserServiceImpl implements UserService{
     }
 
 
-    /* public UserDTO updateUserData(String userId, UserRequestUpdate userRequest) {
-        if (!map.containsKey(userId)) {
-            throw new EmptyDataException();
-        }
-        UserDTO user = map.get(userId);
-        user.setName(userRequest.getName());
-        user.setUsername(userRequest.getUsername());
-        map.put(userId, user);
-        return user;
-    }
-
-
-    public UserDTO deleteUser(String userId) {
-        if (!map.containsKey(userId)) {
-            throw new EmptyDataException();
-        }
-        return map.remove(userId);
-    }*/
 }

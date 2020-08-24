@@ -2,8 +2,7 @@ package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Controllers;
 
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserDTO;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserRequest;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserReponseModel;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserRequestUpdate;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Service.UserServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -13,11 +12,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,10 +48,10 @@ public class UserController {
 
 
     @GetMapping(path = "/userId/{userId}", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<UserReponseModel> getUser(@PathVariable("userId") String userId) {
+    public ResponseEntity<UserResponseModel> getUser(@PathVariable("userId") String userId) {
         UserDTO userDTO = userService.getUserDetailsByUserId(userId);
-        UserReponseModel userReponseModel = new ModelMapper().map(userDTO, UserReponseModel.class);
-        return new ResponseEntity<>(userReponseModel, HttpStatus.OK);
+        UserResponseModel userResponseModel = new ModelMapper().map(userDTO, UserResponseModel.class);
+        return new ResponseEntity<>(userResponseModel, HttpStatus.OK);
     }
 
 
