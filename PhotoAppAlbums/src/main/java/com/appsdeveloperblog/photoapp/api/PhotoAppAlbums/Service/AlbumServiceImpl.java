@@ -26,7 +26,7 @@ public class AlbumServiceImpl implements AlbumsService{
         albumDTO2.setAlbumId("album2");
         albumDTO2.setName("Album 2");
         albumDTO2.setDescription("This is album 2");
-        albumDTO2.setUserId("user2");
+        albumDTO2.setUserId(userId);
 
         albumList.add(albumDTO);
         albumList.add(albumDTO2);
