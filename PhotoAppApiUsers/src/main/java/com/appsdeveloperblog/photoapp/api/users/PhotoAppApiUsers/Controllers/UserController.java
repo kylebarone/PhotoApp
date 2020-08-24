@@ -1,10 +1,10 @@
 package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Controllers;
 
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.LoginUserRequest;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserDTO;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserRequest;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserReponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserRequestUpdate;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserResponse;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Service.UserServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -39,32 +39,36 @@ public class UserController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
+    public ResponseEntity<CreateUserResponseModel> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         UserDTO userDTO = modelMapper.map(userRequest, UserDTO.class);
         UserDTO returnUserDTO = userService.createUser(userDTO);
-        UserResponse response = modelMapper.map(returnUserDTO, UserResponse.class);
+        CreateUserResponseModel response = modelMapper.map(returnUserDTO, CreateUserResponseModel.class);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
+    @GetMapping(path = "/userId/{userId}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserReponseModel> getUser(@PathVariable("userId") String userId) {
+        UserDTO userDTO = userService.getUserDetailsByUserId(userId);
+        UserReponseModel userReponseModel = new ModelMapper().map(userDTO, UserReponseModel.class);
+        return new ResponseEntity<>(userReponseModel, HttpStatus.OK);
+    }
 
 
+    @GetMapping(path = "/status")
+    public ResponseEntity<String> getStatus() {
+        String statusMessage = "Working on port: " + env.getProperty("local.server.port");
+        return new ResponseEntity<>(statusMessage,
+                HttpStatus.OK);
+    }
 
 
     //gotta go back and redo the below shit with what I know now
 
-    @GetMapping(path="/{userId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getUserData(@PathVariable String userId) {
-
-        UserDTO returnUser = userService.getUserData(userId);
-        return new ResponseEntity<>(returnUser, HttpStatus.OK);
-    }
-
-    @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE,
+    /*@PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE )
     public ResponseEntity<UserDTO> updateUserData(@PathVariable String userId,
                                                   @Valid @RequestBody UserRequestUpdate userRequest) {
@@ -77,15 +81,6 @@ public class UserController {
     public ResponseEntity<UserDTO> deleteUser(@PathVariable String userId) {
         UserDTO returnUser = userService.deleteUser(userId);
         return new ResponseEntity<>(returnUser, HttpStatus.OK);
-    }
-
-
-    @GetMapping(path = "/status")
-    public ResponseEntity<String> getStatus() {
-        String statusMessage = "Working on port: " + env.getProperty("local.server.port") + " ->" + env.getProperty("test.example")
-                + "  " + env.getProperty("test.exampleJr");
-        return new ResponseEntity<>(statusMessage,
-                HttpStatus.OK);
-    }
+    }*/
 
 }

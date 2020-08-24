@@ -33,15 +33,28 @@ public class UserServiceImpl implements UserService{
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserDTO getUserData(String userId) {
-        UserEntity userEntity = userRepository.findByUserId(userId);
 
+    @Override
+    public UserDTO getUserDetailsByUserId(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
         if (userEntity == null) {
-            throw new UsernameNotFoundException(userId);
+            throw new UsersServiceException(userId);
         }
+        UserDTO userDTO = new ModelMapper().map(userEntity, UserDTO.class);
+        return userDTO;
+    }
+
+
+    @Override
+    public UserDTO getUserDetailsByUsername(String username) {
+        UserEntity userEntity = userRepository.findByUsername(username);
+        if (userEntity == null) throw new UsernameNotFoundException(username);
+
         return new ModelMapper().map(userEntity, UserDTO.class);
     }
 
+
+    @Override
     public UserDTO createUser(UserDTO userDetails) {
 
         String userId = UUID.randomUUID().toString();
@@ -58,16 +71,20 @@ public class UserServiceImpl implements UserService{
         return returnUserDetails;
     }
 
+
+    // since we use user details service to authenticate password we need a way for it to acess db for this authentivation and thats where this method comes into play
     @Override
-    public UserDTO getUserDetailsByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByUsername(username);
         if (userEntity == null) throw new UsernameNotFoundException(username);
 
-        return new ModelMapper().map(userEntity, UserDTO.class);
+        // this comes from the userDetails interface
+        return new User(userEntity.getUsername(), userEntity.getEncryptedPass(),
+                true, true, true, true, new ArrayList<>());
     }
 
 
-    public UserDTO updateUserData(String userId, UserRequestUpdate userRequest) {
+    /* public UserDTO updateUserData(String userId, UserRequestUpdate userRequest) {
         if (!map.containsKey(userId)) {
             throw new EmptyDataException();
         }
@@ -84,16 +101,5 @@ public class UserServiceImpl implements UserService{
             throw new EmptyDataException();
         }
         return map.remove(userId);
-    }
-
-    // since we use user details service to authenticate password we need a way for it to acess db for this authentivation and thats where this method comes into play
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByUsername(username);
-        if (userEntity == null) throw new UsernameNotFoundException(username);
-
-        // this comes from the userDetails interface
-        return new User(userEntity.getUsername(), userEntity.getEncryptedPass(),
-                true, true, true, true, new ArrayList<>());
-    }
+    }*/
 }
