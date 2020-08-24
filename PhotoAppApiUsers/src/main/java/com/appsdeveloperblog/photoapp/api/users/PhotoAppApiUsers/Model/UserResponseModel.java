@@ -1,43 +1,16 @@
 package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model;
 
-
-import java.io.Serializable;
 import java.util.List;
 
-public class UserDTO implements Serializable {
+/**
+ * Returns User Details
+ */
+public class UserResponseModel {
 
-    private static final long serialVersionUID = -4318371923857L;
     private String name;
     private String userId;
     private String username;
-    private String email;
-    private String password;
-    private String encryptedPass;
     private List<AlbumResponseModel> albums;
-
-    public String getEncryptedPass() {
-        return encryptedPass;
-    }
-
-    public void setEncryptedPass(String encryptedPass) {
-        this.encryptedPass = encryptedPass;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getName() {
         return name;
@@ -71,4 +44,3 @@ public class UserDTO implements Serializable {
         this.albums = albums;
     }
 }
-

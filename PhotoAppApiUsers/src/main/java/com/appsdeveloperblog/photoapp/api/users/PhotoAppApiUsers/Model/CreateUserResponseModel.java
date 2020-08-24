@@ -1,6 +1,6 @@
 package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model;
 
-public class UserResponse {
+public class CreateUserResponseModel {
 
     private String name;
     private String userId;

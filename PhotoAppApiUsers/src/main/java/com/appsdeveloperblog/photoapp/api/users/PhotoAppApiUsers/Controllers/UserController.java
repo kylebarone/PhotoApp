@@ -1,10 +1,9 @@
 package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Controllers;
 
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.LoginUserRequest;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserDTO;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserRequest;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserRequestUpdate;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserResponse;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserResponseModel;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Service.UserServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -13,11 +12,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,32 +36,36 @@ public class UserController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
+    public ResponseEntity<CreateUserResponseModel> createUser(@Valid @RequestBody CreateUserRequest userRequest) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         UserDTO userDTO = modelMapper.map(userRequest, UserDTO.class);
         UserDTO returnUserDTO = userService.createUser(userDTO);
-        UserResponse response = modelMapper.map(returnUserDTO, UserResponse.class);
+        CreateUserResponseModel response = modelMapper.map(returnUserDTO, CreateUserResponseModel.class);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
+    @GetMapping(path = "/userId/{userId}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserResponseModel> getUser(@PathVariable("userId") String userId) {
+        UserDTO userDTO = userService.getUserDetailsByUserId(userId);
+        UserResponseModel userResponseModel = new ModelMapper().map(userDTO, UserResponseModel.class);
+        return new ResponseEntity<>(userResponseModel, HttpStatus.OK);
+    }
 
 
+    @GetMapping(path = "/status")
+    public ResponseEntity<String> getStatus() {
+        String statusMessage = "Working on port: " + env.getProperty("local.server.port");
+        return new ResponseEntity<>(statusMessage,
+                HttpStatus.OK);
+    }
 
 
     //gotta go back and redo the below shit with what I know now
 
-    @GetMapping(path="/{userId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getUserData(@PathVariable String userId) {
-
-        UserDTO returnUser = userService.getUserData(userId);
-        return new ResponseEntity<>(returnUser, HttpStatus.OK);
-    }
-
-    @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE,
+    /*@PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE )
     public ResponseEntity<UserDTO> updateUserData(@PathVariable String userId,
                                                   @Valid @RequestBody UserRequestUpdate userRequest) {
@@ -77,14 +78,6 @@ public class UserController {
     public ResponseEntity<UserDTO> deleteUser(@PathVariable String userId) {
         UserDTO returnUser = userService.deleteUser(userId);
         return new ResponseEntity<>(returnUser, HttpStatus.OK);
-    }
-
-
-    @GetMapping(path = "/status")
-    public ResponseEntity<String> getStatus() {
-        String statusMessage = "Working on port: " + env.getProperty("local.server.port") + " ->" + env.getProperty("test.example");
-        return new ResponseEntity<>(statusMessage,
-                HttpStatus.OK);
-    }
+    }*/
 
 }

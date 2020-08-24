@@ -5,7 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
 
-    public UserDTO createUser(UserDTO userDetails);
+    UserDTO createUser(UserDTO userDetails);
 
-    public UserDTO getUserDetailsByUsername(String username);
+    UserDTO getUserDetailsByUsername(String username);
+
+    UserDTO getUserDetailsByUserId(String userId);
 }

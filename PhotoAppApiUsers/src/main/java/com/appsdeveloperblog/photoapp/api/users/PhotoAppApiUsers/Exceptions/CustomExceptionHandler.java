@@ -17,6 +17,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<Object>(ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = {UsersServiceException.class})
+    protected ResponseEntity<Object> handleUsersServiceException(UsersServiceException ex, WebRequest request) {
+        return new ResponseEntity<Object>(ex.toString(), HttpStatus.BAD_REQUEST);
+    }
 
     /*@ExceptionHandler(value = {MethodArgumentNotValidException.class})
     protected ResponseEntity<Object> handleEx(MethodArgumentNotValidException ex, WebRequest request) {

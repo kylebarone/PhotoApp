@@ -9,6 +9,11 @@ public class ErrorMessage {
         this.stackTrace = stackTrace;
     }
 
+    public ErrorMessage(String stackTrace) {
+        this.message = null;
+        this.stackTrace = stackTrace;
+    }
+
     public ErrorMessage() {
     }
 
