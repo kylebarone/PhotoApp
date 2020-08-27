@@ -1,9 +1,11 @@
 package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Service;
+import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.AlbumsServiceClient;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.UserEntity;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.UserRepository;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Exceptions.*;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.AlbumResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserDTO;
+import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
@@ -30,17 +32,20 @@ public class UserServiceImpl implements UserService{
     UserRepository userRepository;
     RestTemplate restTemplate;
     Environment env;
+    AlbumsServiceClient albumsServiceClient;
 
     BCryptPasswordEncoder bCryptPasswordEncoder;
     Logger logger = LoggerFactory.getLogger(this.getClass());;
 
     @Autowired
     public UserServiceImpl(Environment env, UserRepository userRepository,
-                           RestTemplate restTemplate, BCryptPasswordEncoder bCryptPasswordEncoder) {
+                           RestTemplate restTemplate, BCryptPasswordEncoder bCryptPasswordEncoder,
+                           AlbumsServiceClient albumsServiceClient) {
         this.env = env;
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.restTemplate = restTemplate;
+        this.albumsServiceClient = albumsServiceClient;
     }
 
 
@@ -53,14 +58,18 @@ public class UserServiceImpl implements UserService{
 
         UserDTO userDTO = new ModelMapper().map(userEntity, UserDTO.class);
 
-        String url = String.format(env.getProperty("api.albums-ws.endpoints.getAlbums.url"), userDTO.getUserId());
-        logger.info("!!!!!Making API call to " + url + " !!!!");
-        ResponseEntity<List<AlbumResponseModel>> responseEntity = restTemplate
-                .exchange(url, HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<AlbumResponseModel>>(){});
-        logger.info("!!!!!API call was made!!!!");
+        //String url = String.format(env.getProperty("api.albums-ws.endpoints.getAlbums.url"), userDTO.getUserId());
+        //ResponseEntity<List<AlbumResponseModel>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<AlbumResponseModel>>(){});
+        try {
+            logger.info("Making API call to albums-ws !!!!");
+            List<AlbumResponseModel> response = albumsServiceClient.getAlbums(userDTO.getUserId());
+            logger.info("!!!!!API call was made!!!!");
+            userDTO.setAlbums(response);
+        } catch (FeignException ex) {
+            logger.info(String.format("API Call to albums-ws with userId %s failed", userDTO.getUserId()));
+            logger.error(ex.getLocalizedMessage());
+        }
 
-        userDTO.setAlbums(responseEntity.getBody());
         return userDTO;
     }
 
