@@ -2,14 +2,10 @@ package com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Service;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.UserEntity;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Data.UserRepository;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Exceptions.*;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.FakeDataBase;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.AlbumResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserDTO;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.CreateUserRequest;
-import com.appsdeveloperblog.photoapp.api.users.PhotoAppApiUsers.Model.UserRequestUpdate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.spi.MatchingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
