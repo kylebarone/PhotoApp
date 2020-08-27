@@ -2,6 +2,7 @@ package com.appsdeveloperblog.photoapp.api.ZuulAPIGateway.ZuulAPIGateway.Securit
 
 
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
     Environment environment;
 
+    @Autowired
     public AuthorizationFilter(AuthenticationManager authenticationManager, Environment environment) {
         super(authenticationManager);
         this.environment = environment;
